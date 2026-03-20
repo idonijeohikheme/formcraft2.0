@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FormCraft AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800&family=Instrument+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0a0a0f;--ink-2:#2d2d3a;--ink-3:#6b6b80;
+  --bg:#f4f3f8;--s0:#ffffff;--s1:#eeedf5;--s2:#e5e3f0;
+  --a:#4f35e8;--a2:#7560f0;--al:#eceafd;--am:rgba(79,53,232,0.1);
+  --g:#0fa068;--gl:#e0f5ec;
+  --r:#e03545;--rl:#fdeaec;
+  --w:#d4820a;--wl:#fef3e0;
+  --bd:rgba(79,53,232,0.08);--bdm:rgba(79,53,232,0.18);--bds:rgba(79,53,232,0.28);
+  --rad:10px;--radl:16px;--radxl:22px;
+  --fd:'Cabinet Grotesk',sans-serif;--fb:'Instrument Sans',sans-serif;
+}
+body{font-family:var(--fb);background:var(--bg);color:var(--ink);min-height:100vh;font-size:14px;}
+
+/* HEADER */
+.hdr{background:var(--s0);border-bottom:1px solid var(--bd);padding:0 2rem;position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);}
+.hi{max-width:1020px;margin:0 auto;height:58px;display:flex;align-items:center;justify-content:space-between;}
+.logo{display:flex;align-items:center;gap:11px;}
+.logo-dot{width:32px;height:32px;background:var(--a);border-radius:9px;display:grid;place-items:center;position:relative;overflow:hidden;}
+.logo-dot::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2),transparent);}
+.logo-dot svg{width:17px;height:17px;fill:white;position:relative;z-index:1;}
+.logo-name{font-family:var(--fd);font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.4px;}
+.logo-name span{color:var(--a);}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.free-tag{background:var(--gl);color:var(--g);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.4px;border:1px solid rgba(15,160,104,.2);}
+.key-status{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-3);}
+.key-dot{width:7px;height:7px;border-radius:50%;background:var(--s2);}
+.key-dot.ok{background:var(--g);}
+
+/* LAYOUT */
+.wrap{max-width:1020px;margin:0 auto;padding:1.5rem 2rem;display:grid;grid-template-columns:390px 1fr;gap:1.25rem;align-items:start;}
+
+/* PANEL */
+.panel{background:var(--s0);border-radius:var(--radl);border:1px solid var(--bd);overflow:hidden;}
+.ph{padding:1rem 1.25rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px;}
+.phi{width:28px;height:28px;border-radius:7px;display:grid;place-items:center;flex-shrink:0;}
+.phi svg{width:14px;height:14px;}
+.phi.blue{background:var(--al);} .phi.blue svg{fill:var(--a);}
+.phi.green{background:var(--gl);} .phi.green svg{fill:var(--g);}
+.pt{font-family:var(--fd);font-size:13px;font-weight:700;color:var(--ink);}
+.ps{font-size:11px;color:var(--ink-3);margin-top:1px;}
+.pb{padding:1.25rem;}
+
+/* API KEY SETUP */
+.key-setup{background:var(--am);border:1px solid var(--bdm);border-radius:var(--rad);padding:1rem;margin-bottom:1.1rem;}
+.key-setup-title{font-family:var(--fd);font-size:12px;font-weight:700;color:var(--a);margin-bottom:.4rem;display:flex;align-items:center;gap:5px;}
+.key-setup-title svg{width:13px;height:13px;fill:var(--a);}
+.key-setup-desc{font-size:11px;color:var(--ink-2);margin-bottom:.7rem;line-height:1.6;}
+.key-setup-desc a{color:var(--a);font-weight:600;text-decoration:none;}
+.key-setup-desc a:hover{text-decoration:underline;}
+.key-row{display:flex;gap:6px;}
+.key-row input{flex:1;border:1px solid var(--bdm);border-radius:var(--rad);padding:8px 10px;font-family:monospace;font-size:11px;color:var(--ink);background:var(--s0);outline:none;transition:border-color .2s;}
+.key-row input:focus{border-color:var(--a);}
+.key-saved{display:none;align-items:center;gap:6px;font-size:11px;color:var(--g);font-weight:600;margin-top:.4rem;}
+.key-saved.show{display:flex;}
+.key-saved svg{width:13px;height:13px;fill:var(--g);}
+
+/* STEPS */
+.steps{display:flex;align-items:center;margin-bottom:1.1rem;}
+.stp{display:flex;align-items:center;gap:5px;flex:1;}
+.stn{width:22px;height:22px;border-radius:50%;border:2px solid var(--bds);background:var(--s0);display:grid;place-items:center;font-size:10px;font-weight:700;color:var(--ink-3);flex-shrink:0;transition:all .25s;}
+.stn.on{border-color:var(--a);background:var(--a);color:#fff;}
+.stn.ok{border-color:var(--g);background:var(--g);color:#fff;}
+.stl{font-size:10px;color:var(--ink-3);}
+.stl.on{color:var(--a);font-weight:600;}
+.stline{height:1px;flex:1;background:var(--bd);margin:0 3px;}
+
+/* UPLOAD */
+.dz{border:2px dashed var(--bds);border-radius:var(--rad);padding:1.4rem 1rem;text-align:center;cursor:pointer;position:relative;background:var(--s1);transition:all .2s;}
+.dz:hover,.dz.ov{border-color:var(--a);background:var(--al);}
+.dz input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.dz-icon{width:38px;height:38px;background:var(--al);border-radius:9px;margin:0 auto 8px;display:grid;place-items:center;}
+.dz-icon svg{width:19px;height:19px;fill:var(--a);}
+.dz-t{font-size:13px;font-weight:600;margin-bottom:2px;font-family:var(--fd);}
+.dz-s{font-size:11px;color:var(--ink-3);}
+.fmts{display:flex;gap:4px;justify-content:center;margin-top:7px;flex-wrap:wrap;}
+.fmt{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;border:1px solid var(--bds);color:var(--ink-3);letter-spacing:.5px;}
+
+.fok{display:none;align-items:center;gap:10px;padding:9px 11px;background:var(--gl);border-radius:var(--rad);margin-bottom:.85rem;border:1px solid rgba(15,160,104,.2);}
+.fok.show{display:flex;}
+.fok-icon{width:30px;height:30px;background:#fff;border-radius:7px;display:grid;place-items:center;flex-shrink:0;}
+.fok-icon svg{width:15px;height:15px;fill:var(--g);}
+.fok-name{font-size:12px;font-weight:600;color:var(--g);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.frm{background:none;border:none;cursor:pointer;color:var(--g);font-size:14px;opacity:.7;}
+.frm:hover{opacity:1;}
+
+.or{display:flex;align-items:center;gap:8px;margin:.75rem 0;font-size:11px;color:var(--ink-3);}
+.or::before,.or::after{content:'';flex:1;height:1px;background:var(--bd);}
+
+/* FORM INPUTS */
+textarea,input[type=text],select{width:100%;border:1px solid var(--bdm);border-radius:var(--rad);padding:9px 11px;font-family:var(--fb);font-size:13px;color:var(--ink);background:var(--s0);outline:none;transition:border-color .2s;}
+textarea:focus,input[type=text]:focus,select:focus{border-color:var(--a);}
+textarea{resize:vertical;min-height:100px;line-height:1.65;}
+textarea::placeholder,input::placeholder{color:var(--ink-3);}
+
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.85rem;}
+.sf label{display:block;font-size:10px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:.6rem;}
+.chip{padding:4px 11px;border-radius:20px;border:1px solid var(--bdm);font-size:11px;cursor:pointer;transition:all .15s;color:var(--ink-3);background:var(--s0);user-select:none;}
+.chip.on{background:var(--al);border-color:var(--a);color:var(--a);font-weight:600;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:var(--rad);font-family:var(--fb);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none;outline:none;}
+.btn-main{background:var(--a);color:#fff;width:100%;margin-top:1rem;padding:13px;font-family:var(--fd);font-weight:800;font-size:14px;letter-spacing:-.2px;}
+.btn-main:hover{background:#3d28c4;transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,53,232,.35);}
+.btn-main:active{transform:none;box-shadow:none;}
+.btn-main:disabled{background:var(--s2);color:var(--ink-3);transform:none;box-shadow:none;cursor:not-allowed;}
+.btn-out{background:transparent;color:var(--ink);border:1px solid var(--bds);padding:7px 12px;font-size:11px;}
+.btn-out:hover{background:var(--s1);}
+.btn-g{background:var(--g);color:#fff;flex:1;}
+.btn-g:hover{background:#0a7a50;}
+.btn-xs{padding:6px 12px;font-size:11px;background:var(--s1);color:var(--ink-2);border:1px solid var(--bdm);}
+.btn-xs:hover{background:var(--s2);}
+
+/* RIGHT STATES */
+.st-empty{padding:2.5rem 1.5rem;text-align:center;color:var(--ink-3);}
+.st-empty-icon{width:52px;height:52px;border-radius:13px;background:var(--s1);margin:0 auto .9rem;display:grid;place-items:center;}
+.st-empty-icon svg{width:26px;height:26px;fill:var(--ink-3);opacity:.35;}
+.st-empty h3{font-family:var(--fd);font-size:15px;font-weight:800;color:var(--ink-2);margin-bottom:5px;}
+.st-empty p{font-size:12px;max-width:260px;margin:0 auto;line-height:1.7;}
+
+/* LOADING */
+.st-load{display:none;padding:2.5rem 1.5rem;text-align:center;}
+.st-load.show{display:block;}
+.spinner{width:42px;height:42px;border:3px solid var(--bd);border-top-color:var(--a);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-title{font-family:var(--fd);font-size:15px;font-weight:800;color:var(--ink);margin-bottom:.9rem;}
+.load-steps{list-style:none;text-align:left;max-width:240px;margin:0 auto;}
+.ls{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:var(--ink-3);transition:all .3s;}
+.ls.on{color:var(--a);font-weight:600;}
+.ls.ok{color:var(--g);}
+.ls-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+/* FORM PREVIEW */
+.fp{display:none;}
+.fp.show{display:block;}
+.fp-top{padding:1.1rem 1.25rem;border-bottom:1px solid var(--bd);}
+.fp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.fp-lbl{font-size:10px;font-weight:700;color:var(--a);text-transform:uppercase;letter-spacing:.5px;}
+.ti{font-family:var(--fd);font-size:19px;font-weight:800;color:var(--ink);border:none;outline:none;width:100%;background:transparent;border-bottom:2px solid transparent;transition:border-color .2s;padding:3px 0;letter-spacing:-.3px;}
+.ti:focus{border-bottom-color:var(--a);}
+.di{font-size:12px;color:var(--ink-3);border:none;outline:none;width:100%;background:transparent;border-bottom:1px solid transparent;transition:border-color .2s;padding:2px 0;font-family:var(--fb);}
+.di:focus{border-bottom-color:var(--bdm);}
+
+.stats{display:none;padding:.65rem 1.25rem;gap:6px;border-bottom:1px solid var(--bd);}
+.stats.show{display:flex;flex-wrap:wrap;}
+.stat{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 8px;border-radius:20px;background:var(--s1);color:var(--ink-3);border:1px solid var(--bd);}
+.stat strong{color:var(--a);font-weight:700;}
+
+.ql{padding:.9rem 1.25rem;}
+.qc{background:var(--s0);border:1px solid var(--bd);border-radius:var(--rad);padding:.85rem .95rem;margin-bottom:7px;position:relative;transition:all .2s;}
+.qc:hover{border-color:var(--bds);box-shadow:0 2px 12px rgba(79,53,232,.06);}
+.qc-top{display:flex;align-items:flex-start;gap:8px;}
+.qn{width:18px;height:18px;border-radius:50%;background:var(--al);color:var(--a);font-size:9px;font-weight:700;display:grid;place-items:center;flex-shrink:0;margin-top:2px;}
+.qb{flex:1;min-width:0;}
+.qtag{display:inline-flex;align-items:center;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;margin-bottom:5px;border:1px solid;}
+.qtag.tx{background:#e6f1fb;color:#185fa5;border-color:#b5d4f4;}
+.qtag.ch{background:var(--al);color:var(--a);border-color:rgba(79,53,232,.25);}
+.qtag.sc{background:var(--wl);color:var(--w);border-color:rgba(212,130,10,.25);}
+.qtag.dt{background:var(--gl);color:var(--g);border-color:rgba(15,160,104,.25);}
+.qtag.pa{background:#f1efe8;color:#5f5e5a;border-color:#d3d1c7;}
+.qtxt{font-size:13px;font-weight:500;color:var(--ink);border:none;outline:none;width:100%;background:transparent;font-family:var(--fb);padding:0;resize:none;line-height:1.5;border-bottom:1px solid transparent;transition:border-color .2s;}
+.qtxt:focus{border-bottom-color:var(--a);}
+.qreq{font-size:9px;color:var(--r);font-weight:700;flex-shrink:0;margin-top:2px;}
+.qopts{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px;}
+.qopt{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--s1);color:var(--ink-2);border:1px solid var(--bd);}
+.qacts{display:flex;gap:3px;position:absolute;right:7px;top:7px;opacity:0;transition:opacity .15s;}
+.qc:hover .qacts{opacity:1;}
+.qa{width:23px;height:23px;border-radius:5px;border:none;background:var(--s1);cursor:pointer;display:grid;place-items:center;transition:background .15s;}
+.qa:hover{background:var(--s2);}
+.qa svg{width:11px;height:11px;fill:var(--ink-3);}
+.qa.del:hover{background:var(--rl);}
+.qa.del:hover svg{fill:var(--r);}
+.add-q{width:100%;padding:8px;border:1px dashed var(--bds);border-radius:var(--rad);background:transparent;cursor:pointer;font-family:var(--fb);font-size:11px;color:var(--ink-3);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:1.1rem;}
+.add-q:hover{border-color:var(--a);color:var(--a);background:var(--al);}
+
+.act{padding:.9rem 1.25rem;border-top:1px solid var(--bd);display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+
+/* RESULT */
+.res{display:none;margin:0 1.25rem 1rem;padding:1rem;background:var(--gl);border-radius:var(--rad);border:1px solid rgba(15,160,104,.2);}
+.res.show{display:block;}
+.res-title{font-family:var(--fd);font-size:13px;font-weight:800;color:var(--g);margin-bottom:.5rem;display:flex;align-items:center;gap:5px;}
+.res-title svg{width:14px;height:14px;fill:var(--g);}
+.scr{background:#fff;border-radius:var(--rad);border:1px solid rgba(15,160,104,.18);padding:.7rem;font-family:monospace;font-size:10.5px;color:var(--ink-2);max-height:160px;overflow-y:auto;line-height:1.7;white-space:pre-wrap;word-break:break-all;}
+.copy-scr{margin-top:.5rem;width:100%;padding:6px;border-radius:var(--rad);border:1px solid rgba(15,160,104,.3);background:#fff;cursor:pointer;font-size:11px;font-weight:700;color:var(--g);font-family:var(--fb);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.copy-scr:hover{background:rgba(15,160,104,.07);}
+.copy-scr svg{width:12px;height:12px;fill:var(--g);}
+.res-steps{font-size:11px;color:var(--g);margin-top:.65rem;line-height:1.9;}
+.res-steps a{color:var(--g);font-weight:700;}
+
+/* MODAL */
+.mbg{display:none;position:fixed;inset:0;background:rgba(10,10,15,.55);z-index:200;align-items:center;justify-content:center;padding:1rem;}
+.mbg.show{display:flex;}
+.modal{background:var(--s0);border-radius:var(--radxl);width:100%;max-width:400px;padding:1.4rem;border:1px solid var(--bd);box-shadow:0 24px 60px rgba(0,0,0,.14);animation:mIn .2s ease;}
+@keyframes mIn{from{transform:scale(.94) translateY(10px);opacity:0}to{transform:none;opacity:1}}
+.mt{font-family:var(--fd);font-size:15px;font-weight:800;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:center;}
+.mx{background:none;border:none;cursor:pointer;font-size:18px;color:var(--ink-3);}
+.mx:hover{color:var(--ink);}
+.fg{margin-bottom:.85rem;}
+.fl{display:block;font-size:10px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.to{border:1px solid var(--bdm);border-radius:var(--rad);padding:7px 5px;text-align:center;cursor:pointer;transition:all .15s;font-size:10px;color:var(--ink-3);}
+.to:hover{border-color:var(--a);color:var(--a);background:var(--al);}
+.to.on{border-color:var(--a);background:var(--a);color:#fff;}
+.to-ic{font-size:15px;display:block;margin-bottom:2px;}
+.rr{display:flex;align-items:center;gap:7px;margin-bottom:.85rem;font-size:12px;cursor:pointer;}
+.rr input{accent-color:var(--a);}
+
+/* NOTIF */
+.notif{position:fixed;top:66px;right:1.25rem;background:var(--ink);color:#fff;padding:9px 14px;border-radius:var(--rad);font-size:12px;z-index:300;transform:translateX(130%);transition:transform .3s ease;max-width:300px;box-shadow:0 4px 20px rgba(0,0,0,.18);}
+.notif.show{transform:none;}
+.notif.ok{background:var(--g);}
+.notif.err{background:var(--r);}
+.notif.info{background:var(--a);}
+
+@media(max-width:860px){.wrap{grid-template-columns:1fr;}}
+@media(max-width:500px){.wrap{padding:1rem;}.sg{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hi">
+    <div class="logo">
+      <div class="logo-dot">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM8 13h8v1.5H8V13zm0 3h5v1.5H8V16zm0-6h3v1.5H8V10z"/></svg>
+      </div>
+      <span class="logo-name">Form<span>Craft</span> AI</span>
+    </div>
+    <div class="hdr-right">
+      <span class="free-tag">FREE — Gemini AI</span>
+      <div class="key-status">
+        <div class="key-dot" id="keyDot"></div>
+        <span id="keyLbl">No key saved</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- LEFT -->
+  <div>
+    <div class="panel">
+      <div class="ph">
+        <div class="phi blue"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5z"/></svg></div>
+        <div><div class="pt">Document to Form</div><div class="ps">Free AI — powered by Google Gemini</div></div>
+      </div>
+      <div class="pb">
+
+        <!-- STEPS -->
+        <div class="steps">
+          <div class="stp"><div class="stn on" id="s1">1</div><span class="stl on" id="sl1">Setup</span></div>
+          <div class="stline"></div>
+          <div class="stp"><div class="stn" id="s2">2</div><span class="stl" id="sl2">Document</span></div>
+          <div class="stline"></div>
+          <div class="stp"><div class="stn" id="s3">3</div><span class="stl" id="sl3">Export</span></div>
+        </div>
+
+        <!-- API KEY -->
+        <div class="key-setup">
+          <div class="key-setup-title">
+            <svg viewBox="0 0 24 24"><path d="M12.65 10A6 6 0 1 0 10 12.65V14h-2v2h2v2h2v-2h2v-2h2v-2h-2v-1.35A6 6 0 0 0 12.65 10zM7 10a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/></svg>
+            Free Gemini API Key
+          </div>
+          <div class="key-setup-desc">
+            Get your free key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> — no credit card, no payment ever. Sign in with Google and click "Create API Key".
+          </div>
+          <div class="key-row">
+            <input type="password" id="apiKey" placeholder="AIza..." />
+            <button class="btn btn-out" onclick="saveKey()" style="white-space:nowrap;padding:8px 14px;font-size:12px;">Save Key</button>
+          </div>
+          <div class="key-saved" id="keySaved">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            API key saved — ready to generate!
+          </div>
+        </div>
+
+        <!-- FILE UPLOAD -->
+        <div class="fok" id="fok">
+          <div class="fok-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5z"/></svg></div>
+          <span class="fok-name" id="fName">file.txt</span>
+          <button class="frm" onclick="clearFile()">✕</button>
+        </div>
+
+        <div class="dz" id="dz">
+          <input type="file" id="fIn" accept=".txt,.md,.csv,.docx" onchange="handleFile(this)">
+          <div class="dz-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zm-2 9.5v4h-2v-4H6l4-4 4 4h-3z"/></svg></div>
+          <div class="dz-t">Drop your document here</div>
+          <div class="dz-s">or click to browse</div>
+          <div class="fmts"><span class="fmt">TXT</span><span class="fmt">MD</span><span class="fmt">CSV</span><span class="fmt">DOCX</span></div>
+        </div>
+
+        <div class="or">or paste text directly</div>
+
+        <textarea id="docText" placeholder="Paste your document, describe your topic, or type anything...&#10;&#10;Examples:&#10;• Job description → interview form&#10;• Research topic → data collection survey&#10;• Product brief → customer feedback form&#10;• Meeting notes → action tracker" rows="6"></textarea>
+
+        <!-- SETTINGS -->
+        <div style="margin-top:.9rem;">
+          <div style="font-size:10px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">Settings</div>
+          <div class="sg">
+            <div class="sf" style="grid-column:1/-1;">
+              <label>Form Title (optional)</label>
+              <input type="text" id="formTitle" placeholder="Gemini will suggest one from your content" />
+            </div>
+            <div class="sf">
+              <label>Audience</label>
+              <select id="audience">
+                <option value="general">General</option>
+                <option value="professional">Professional</option>
+                <option value="academic">Academic / Research</option>
+                <option value="customer">Customer Feedback</option>
+                <option value="hr">HR / Internal</option>
+                <option value="event">Event Registration</option>
+              </select>
+            </div>
+            <div class="sf">
+              <label>Max Questions</label>
+              <select id="maxQ">
+                <option value="5">5 questions</option>
+                <option value="10" selected>10 questions</option>
+                <option value="15">15 questions</option>
+                <option value="20">20 questions</option>
+                <option value="30">30 questions</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-top:.8rem;">
+            <div style="font-size:10px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;">Question Types</div>
+            <div class="chips" id="chips">
+              <span class="chip on" data-t="short_answer">Short Answer</span>
+              <span class="chip on" data-t="multiple_choice">Multiple Choice</span>
+              <span class="chip on" data-t="paragraph">Paragraph</span>
+              <span class="chip on" data-t="linear_scale">Rating Scale</span>
+              <span class="chip on" data-t="date">Date</span>
+              <span class="chip" data-t="checkboxes">Checkboxes</span>
+              <span class="chip" data-t="dropdown">Dropdown</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-main" id="genBtn" onclick="generate()" disabled>
+          <svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:#fff;"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          Generate Smart Form
+        </button>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div>
+    <div class="panel" id="rightPanel">
+
+      <!-- EMPTY -->
+      <div class="st-empty" id="stEmpty">
+        <div class="st-empty-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2zm-2 10h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg></div>
+        <h3>Your form preview</h3>
+        <p>Save your Gemini API key, add your document, then click Generate — your intelligent form will appear here.</p>
+      </div>
+
+      <!-- LOADING -->
+      <div class="st-load" id="stLoad">
+        <div class="spinner"></div>
+        <div class="load-title">Gemini is reading your document...</div>
+        <ul class="load-steps">
+          <li class="ls on" id="l1"><span class="ls-dot"></span>Sending to Gemini AI</li>
+          <li class="ls" id="l2"><span class="ls-dot"></span>Analyzing content</li>
+          <li class="ls" id="l3"><span class="ls-dot"></span>Crafting questions</li>
+          <li class="ls" id="l4"><span class="ls-dot"></span>Choosing question types</li>
+          <li class="ls" id="l5"><span class="ls-dot"></span>Building your form</li>
+        </ul>
+      </div>
+
+      <!-- FORM PREVIEW -->
+      <div class="fp" id="stPreview">
+        <div class="fp-top">
+          <div class="fp-row">
+            <div class="fp-lbl">Preview — click any field to edit</div>
+            <button class="btn btn-out" style="padding:4px 10px;font-size:10px;" onclick="regenForm()">Regenerate</button>
+          </div>
+          <input type="text" class="ti" id="prevTitle" value="Untitled Form" />
+          <input type="text" class="di" id="prevDesc" placeholder="Form description..." />
+        </div>
+
+        <div class="stats" id="statsRow">
+          <span class="stat"><strong id="qTotal">0</strong> questions</span>
+          <span class="stat"><strong id="qReq">0</strong> required</span>
+          <span class="stat" id="typesStat"></span>
+        </div>
+
+        <div class="ql" id="qlist"></div>
+
+        <div class="act">
+          <button class="btn btn-g" onclick="exportForm()">
+            <svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:#fff;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z"/></svg>
+            Export to Google Forms
+          </button>
+          <button class="btn btn-xs" onclick="copyJSON()">Copy JSON</button>
+          <button class="btn btn-xs" onclick="openModal()">+ Add Q</button>
+        </div>
+
+        <div class="res" id="res">
+          <div class="res-title">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            Google Apps Script Ready!
+          </div>
+          <div class="scr" id="scrBox"></div>
+          <button class="copy-scr" onclick="copyScript()">
+            <svg viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 00-2 2v14h2V3h12V1zm3 4H8a2 2 0 00-2 2v14a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2zm0 16H8V7h11v14z"/></svg>
+            Copy Script
+          </button>
+          <div class="res-steps">
+            <strong>3 steps to go live:</strong><br>
+            1. Copy the script above<br>
+            2. Go to <a href="https://script.google.com" target="_blank">script.google.com</a> → New Project<br>
+            3. Delete existing code → Paste → Ctrl+S → Select <strong>createForm</strong> → Click Run
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ADD QUESTION MODAL -->
+<div class="mbg" id="mbg">
+  <div class="modal">
+    <div class="mt">Add Question <button class="mx" onclick="closeModal()">×</button></div>
+    <div class="fg">
+      <label class="fl">Question Text</label>
+      <input type="text" id="nqT" placeholder="Type your question..." style="width:100%;border:1px solid var(--bdm);border-radius:var(--rad);padding:9px 11px;font-family:var(--fb);font-size:13px;outline:none;" />
+    </div>
+    <div class="fg">
+      <label class="fl">Type</label>
+      <div class="tg" id="tg">
+        <div class="to on" data-t="short_answer" onclick="pickT(this)"><span class="to-ic">✏️</span>Short Answer</div>
+        <div class="to" data-t="paragraph" onclick="pickT(this)"><span class="to-ic">📝</span>Paragraph</div>
+        <div class="to" data-t="multiple_choice" onclick="pickT(this)"><span class="to-ic">🔘</span>Multiple Choice</div>
+        <div class="to" data-t="checkboxes" onclick="pickT(this)"><span class="to-ic">☑️</span>Checkboxes</div>
+        <div class="to" data-t="linear_scale" onclick="pickT(this)"><span class="to-ic">⭐</span>Rating Scale</div>
+        <div class="to" data-t="date" onclick="pickT(this)"><span class="to-ic">📅</span>Date</div>
+      </div>
+    </div>
+    <div class="fg" id="opF" style="display:none;">
+      <label class="fl">Options (one per line)</label>
+      <textarea id="nqO" placeholder="Option 1&#10;Option 2&#10;Option 3" rows="3" style="font-size:12px;"></textarea>
+    </div>
+    <label class="rr"><input type="checkbox" id="nqR"> Required question</label>
+    <div style="display:flex;gap:7px;">
+      <button class="btn btn-out" style="flex:1;" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-main" style="flex:1;margin-top:0;" onclick="addQ()">Add Question</button>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<script>
+let formData=null, fileText='', apiKey='', mType='short_answer', generatedScript='', loadTimer;
+
+// Chips
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>c.classList.toggle('on')));
+document.getElementById('docText').addEventListener('input',checkBtn);
+
+function checkBtn(){
+  const hasContent=document.getElementById('docText').value.trim()||fileText;
+  const hasKey=!!apiKey;
+  document.getElementById('genBtn').disabled=!(hasContent&&hasKey);
+}
+
+// Save API Key
+function saveKey(){
+  const v=document.getElementById('apiKey').value.trim();
+  if(!v||v.length<10){showN('Please enter a valid Gemini API key','err');return;}
+  apiKey=v;
+  document.getElementById('keyDot').classList.add('ok');
+  document.getElementById('keyLbl').textContent='Key saved';
+  document.getElementById('keySaved').classList.add('show');
+  localStorage.setItem('gemini_key',v);
+  checkBtn();
+  showN('API key saved!','ok');
+}
+
+// Load saved key
+window.addEventListener('load',()=>{
+  const saved=localStorage.getItem('gemini_key');
+  if(saved){
+    apiKey=saved;
+    document.getElementById('apiKey').value=saved;
+    document.getElementById('keyDot').classList.add('ok');
+    document.getElementById('keyLbl').textContent='Key saved';
+    document.getElementById('keySaved').classList.add('show');
+    checkBtn();
+  }
+});
+
+// File handling
+function handleFile(inp){
+  const f=inp.files[0];if(!f)return;
+  document.getElementById('fName').textContent=f.name;
+  document.getElementById('fok').classList.add('show');
+  document.getElementById('dz').style.display='none';
+  const r=new FileReader();
+  r.onload=e=>{fileText=e.target.result;checkBtn();};
+  r.readAsText(f);
+}
+function clearFile(){
+  fileText='';
+  document.getElementById('fok').classList.remove('show');
+  document.getElementById('dz').style.display='';
+  document.getElementById('fIn').value='';
+  checkBtn();
+}
+const dz=document.getElementById('dz');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('ov');});
+dz.addEventListener('dragleave',()=>dz.classList.remove('ov'));
+dz.addEventListener('drop',e=>{
+  e.preventDefault();dz.classList.remove('ov');
+  const f=e.dataTransfer.files[0];if(!f)return;
+  const inp=document.getElementById('fIn');
+  const dt=new DataTransfer();dt.items.add(f);inp.files=dt.files;
+  handleFile(inp);
+});
+
+// Loading animation
+function startLoad(){
+  const ids=['l1','l2','l3','l4','l5'];
+  let i=0;
+  ids.forEach(id=>{const el=document.getElementById(id);el.className='ls';});
+  document.getElementById('l1').classList.add('on');
+  loadTimer=setInterval(()=>{
+    if(i<ids.length-1){
+      document.getElementById(ids[i]).className='ls ok';
+      i++;
+      document.getElementById(ids[i]).className='ls on';
+    }
+  },800);
+}
+function stopLoad(){clearInterval(loadTimer);}
+
+// GENERATE via Gemini
+async function generate(){
+  const content=(fileText||document.getElementById('docText').value).trim();
+  if(!content){showN('Please add document content','err');return;}
+  if(!apiKey){showN('Please save your Gemini API key first','err');return;}
+
+  const maxQ=document.getElementById('maxQ').value;
+  const audience=document.getElementById('audience').value;
+  const customTitle=document.getElementById('formTitle').value.trim();
+  const types=[...document.querySelectorAll('.chip.on')].map(c=>c.dataset.t);
+
+  const prompt=`Analyze this document and create a smart questionnaire as JSON.
+
+DOCUMENT:
+${content.substring(0,4000)}
+
+SETTINGS:
+- Target audience: ${audience}
+- Maximum questions: ${maxQ}
+- Allowed question types: ${types.join(', ')}
+${customTitle?`- Form title: ${customTitle}`:'- Suggest an appropriate title'}
+
+Return ONLY valid JSON, no markdown, no explanation, no backticks. Use this exact structure:
+{"title":"Form title","description":"1-2 sentence description","questions":[{"id":1,"text":"Question text","type":"short_answer","required":true,"options":["A","B"]}]}
+
+Rules:
+1. Extract REAL questions relevant to the document - not generic ones
+2. Choose the best question type for each question
+3. For multiple_choice/checkboxes/dropdown: provide 3-5 relevant options
+4. Mark important questions required:true
+5. Use only plain ASCII characters - no special symbols or currency signs
+6. Create logical flow from general to specific`;
+
+  showState('load');
+  startLoad();
+  setSteps(2);
+
+  try{
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${apiKey}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        generationConfig:{temperature:0.7,maxOutputTokens:3000}
+      })
+    });
+
+    stopLoad();
+
+    if(!res.ok){
+      const err=await res.json();
+      throw new Error(err.error?.message||`API error ${res.status}`);
+    }
+
+    const data=await res.json();
+    let text=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    text=text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+    const start=text.indexOf('{');
+    if(start>0)text=text.substring(start);
+
+    formData=JSON.parse(text);
+    if(!formData.questions||!Array.isArray(formData.questions))throw new Error('Invalid response format');
+
+    renderPreview();
+    showState('preview');
+    setSteps(3);
+    showN(`Generated ${formData.questions.length} questions!`,'ok');
+
+  }catch(err){
+    stopLoad();
+    showState('empty');
+    if(err.message.includes('API_KEY_INVALID')||err.message.includes('400')){
+      showN('Invalid API key. Check your Gemini key and try again.','err');
+    }else{
+      showN('Error: '+err.message,'err');
+    }
+  }
+}
+
+function regenForm(){
+  document.getElementById('res').classList.remove('show');
+  generate();
+}
+
+// Render preview
+function renderPreview(){
+  if(!formData)return;
+  document.getElementById('prevTitle').value=formData.title||'Untitled Form';
+  document.getElementById('prevDesc').value=formData.description||'';
+  const list=document.getElementById('qlist');list.innerHTML='';
+  formData.questions.forEach((q,i)=>list.appendChild(makeCard(q,i)));
+  const total=formData.questions.length;
+  const req=formData.questions.filter(q=>q.required).length;
+  const types=[...new Set(formData.questions.map(q=>q.type))];
+  document.getElementById('qTotal').textContent=total;
+  document.getElementById('qReq').textContent=req;
+  document.getElementById('typesStat').innerHTML=`<strong>${types.length}</strong> types`;
+  document.getElementById('statsRow').classList.add('show');
+  document.getElementById('res').classList.remove('show');
+}
+
+function makeCard(q,i){
+  const d=document.createElement('div');d.className='qc';
+  const tm=tmap(q.type);
+  const opts=q.options&&q.options.length?`<div class="qopts">${q.options.map(o=>`<span class="qopt">${o}</span>`).join('')}</div>`:'';
+  d.innerHTML=`
+    <div class="qacts">
+      <button class="qa" onclick="mv(${i},-1)"><svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5z"/></svg></button>
+      <button class="qa" onclick="mv(${i},1)"><svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg></button>
+      <button class="qa del" onclick="dl(${i})"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8a2 2 0 002-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>
+    </div>
+    <div class="qc-top">
+      <div class="qn">${i+1}</div>
+      <div class="qb">
+        <span class="qtag ${tm.c}">${tm.l}</span>
+        <textarea class="qtxt" rows="2" onchange="formData.questions[${i}].text=this.value">${q.text}</textarea>
+        ${opts}
+      </div>
+      ${q.required?'<span class="qreq">*</span>':''}
+    </div>`;
+  return d;
+}
+
+function tmap(t){
+  return{short_answer:{l:'Short answer',c:'tx'},paragraph:{l:'Paragraph',c:'pa'},multiple_choice:{l:'Multiple choice',c:'ch'},checkboxes:{l:'Checkboxes',c:'ch'},dropdown:{l:'Dropdown',c:'ch'},linear_scale:{l:'Rating scale',c:'sc'},date:{l:'Date',c:'dt'}}[t]||{l:t,c:'tx'};
+}
+function dl(i){formData.questions.splice(i,1);renderPreview();}
+function mv(i,d){const n=i+d;if(n<0||n>=formData.questions.length)return;const q=formData.questions.splice(i,1)[0];formData.questions.splice(n,0,q);renderPreview();}
+
+// Export
+function exportForm(){
+  if(!formData)return;
+  formData.title=document.getElementById('prevTitle').value;
+  formData.description=document.getElementById('prevDesc').value;
+  generatedScript=buildScript(formData);
+  document.getElementById('scrBox').textContent=generatedScript;
+  document.getElementById('res').classList.add('show');
+  document.getElementById('res').scrollIntoView({behavior:'smooth',block:'nearest'});
+  navigator.clipboard.writeText(generatedScript).catch(()=>{});
+  showN('Script copied! Open script.google.com to create your form.','ok');
+}
+
+function buildScript(d){
+  const clean=s=>s.replace(/[^\x00-\x7F]/g,'').replace(/"/g,'\\"').trim();
+  const items=d.questions.map(q=>{
+    const t=clean(q.text);const r=q.required?'.setRequired(true)':'';
+    if(q.type==='multiple_choice'){const o=(q.options||['Yes','No']).map(x=>`"${clean(x)}"`).join(',');return`  form.addMultipleChoiceItem().setTitle("${t}").setChoiceValues([${o}])${r};`;}
+    if(q.type==='checkboxes'){const o=(q.options||['Option 1','Option 2']).map(x=>`"${clean(x)}"`).join(',');return`  form.addCheckboxItem().setTitle("${t}").setChoiceValues([${o}])${r};`;}
+    if(q.type==='dropdown'){const o=(q.options||['Option 1','Option 2']).map(x=>`"${clean(x)}"`).join(',');return`  form.addListItem().setTitle("${t}").setChoiceValues([${o}])${r};`;}
+    if(q.type==='linear_scale')return`  form.addScaleItem().setTitle("${t}").setBounds(1,5).setLabels("Poor","Excellent")${r};`;
+    if(q.type==='date')return`  form.addDateItem().setTitle("${t}")${r};`;
+    if(q.type==='paragraph')return`  form.addParagraphTextItem().setTitle("${t}")${r};`;
+    return`  form.addTextItem().setTitle("${t}")${r};`;
+  }).join('\n');
+  return`function createForm() {\n  var form = FormApp.create("${clean(d.title||'My Form')}");\n  form.setDescription("${clean(d.description||'')}");\n  form.setCollectEmail(false);\n${items}\n  Logger.log("Form URL: " + form.getPublishedUrl());\n}`;
+}
+
+function copyScript(){
+  navigator.clipboard.writeText(generatedScript)
+    .then(()=>showN('Script copied!','ok'))
+    .catch(()=>showN('Could not copy','err'));
+}
+function copyJSON(){
+  if(!formData)return;
+  navigator.clipboard.writeText(JSON.stringify(formData,null,2))
+    .then(()=>showN('JSON copied!','ok'))
+    .catch(()=>showN('Could not copy','err'));
+}
+
+// Modal
+function openModal(){document.getElementById('mbg').classList.add('show');}
+function closeModal(){document.getElementById('mbg').classList.remove('show');}
+function pickT(el){
+  document.querySelectorAll('#tg .to').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');mType=el.dataset.t;
+  document.getElementById('opF').style.display=['multiple_choice','checkboxes','dropdown'].includes(mType)?'block':'none';
+}
+function addQ(){
+  const txt=document.getElementById('nqT').value.trim();
+  if(!txt){showN('Enter a question','err');return;}
+  if(!formData)formData={title:'New Form',description:'',questions:[]};
+  const raw=document.getElementById('nqO').value.trim();
+  const opts=raw?raw.split('\n').filter(o=>o.trim()):undefined;
+  formData.questions.push({id:Date.now(),text:txt,type:mType,required:document.getElementById('nqR').checked,options:opts});
+  renderPreview();showState('preview');closeModal();
+  document.getElementById('nqT').value='';document.getElementById('nqO').value='';
+  showN('Question added!','ok');
+}
+
+// State + steps
+function showState(s){
+  document.getElementById('stEmpty').style.display=s==='empty'?'block':'none';
+  document.getElementById('stLoad').classList.toggle('show',s==='load');
+  document.getElementById('stPreview').classList.toggle('show',s==='preview');
+}
+function setSteps(n){
+  for(let i=1;i<=3;i++){
+    const d=document.getElementById(`s${i}`),l=document.getElementById(`sl${i}`);
+    d.className='stn'+(i<n?' ok':i===n?' on':'');
+    l.className='stl'+(i===n?' on':'');
+    d.textContent=i<n?'✓':i;
+  }
+}
+function showN(msg,type=''){
+  const n=document.getElementById('notif');n.textContent=msg;n.className=`notif ${type} show`;
+  setTimeout(()=>n.classList.remove('show'),3500);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+</script>
+</body>
+</html>
